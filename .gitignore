@@ -1,0 +1,9 @@
+*.bak*
+*.BAK*
+*_BACKUP_*
+__pycache__/
+*.pyc
+.DS_Store
+*.swp
+*.swo
+*backup*

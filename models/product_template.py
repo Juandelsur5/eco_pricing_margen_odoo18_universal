@@ -74,79 +74,34 @@ def _channel_prices_excl(self):
         price_excl = cost * (1 + (utility or 0.0) / 100.0)
         return float_round(price_excl, precision_rounding=self.currency_id.rounding)
 
-   return {
-    "T.A.T": p(self.x_utility_pct_tat),
-    "P.O.S": p(self.x_utility_pct_pos),
-    "MAYORISTAS": p(self.x_utility_pct_mayorista),
-    "OFERTA": p(self.x_utility_pct_oferta),
-}
+    return {
+        "T.A.T": p(self.x_utility_pct_tat),
+        "P.O.S": p(self.x_utility_pct_pos),
+        "MAYORISTAS": p(self.x_utility_pct_mayorista),
+        "OFERTA": p(self.x_utility_pct_oferta),
+    }
+
 
 # ==========================================
-# SINCRONIZAR LISTAS
+# WRITE (SIN SINCRONIZAR LISTAS)
 # ==========================================
-def _sync_pricelist_items(self):
-    Pricelist = self.env["product.pricelist"].sudo()
-    Item = self.env["product.pricelist.item"].sudo()
+def write(self, vals):
+    # --- PERMISOS eco_pricing_margen ---
+    if not (self.env.is_superuser() or self.env.user.has_group('base.group_system')):
+        incoming = set(vals.keys())
 
-    for product in self:
-        prices = product._channel_prices_excl()
-
-        for pl_name, fixed_price in prices.items():
-            if fixed_price <= 0:
-                continue
-
-            pricelist = Pricelist.search([("name", "=", pl_name)], limit=1)
-            if not pricelist:
-                continue
-
-            item = Item.search([
-                ("pricelist_id", "=", pricelist.id),
-                ("applied_on", "=", "1_product"),
-                ("product_tmpl_id", "=", product.id),
-            ], limit=1)
-
-            vals = {
-                "pricelist_id": pricelist.id,
-                "applied_on": "1_product",
-                "product_tmpl_id": product.id,
-                "compute_price": "fixed",
-                "fixed_price": fixed_price,
-            }
-
-            if item:
-                item.write(vals)
-            else:
-                Item.create(vals)
-
-    def write(self, vals):
-        # --- PERMISOS eco_pricing_margen ---
-        if not (self.env.is_superuser() or self.env.user.has_group('base.group_system')):
-            incoming = set(vals.keys())
-
-            if incoming & {
-                'x_utility_pct_tat',
-                'x_utility_pct_pos',
-                'x_utility_pct_mayorista',
-                'x_utility_pct_oferta'
-            }:
-                if not self.env.user.has_group('eco_pricing_margen_odoo18_universal.group_margen_precios_edit'):
-                    raise AccessError(_('No autorizado.'))
-
-            if 'x_cost_base' in incoming:
-                if not self.env.user.has_group('eco_pricing_margen_odoo18_universal.group_margen_precios_update_cost'):
-                    raise AccessError(_('No autorizado.'))
-
-        res = super().write(vals)
-
-        watched = {
-            'x_cost_base',
+        if incoming & {
             'x_utility_pct_tat',
             'x_utility_pct_pos',
             'x_utility_pct_mayorista',
             'x_utility_pct_oferta',
-        }
+        }:
+            if not self.env.user.has_group('eco_pricing_margen_odoo18_universal.group_margen_precios_edit'):
+                raise AccessError(_("No autorizado."))
 
-        if watched.intersection(vals.keys()):
-            self._sync_pricelist_items()
+        if 'x_cost_base' in incoming:
+            if not self.env.user.has_group('eco_pricing_margen_odoo18_universal.group_margen_precios_update_cost'):
+                raise AccessError(_("No autorizado."))
 
-        return res
+    res = super().write(vals)
+    return res

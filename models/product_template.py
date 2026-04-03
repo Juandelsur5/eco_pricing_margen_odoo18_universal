@@ -63,10 +63,10 @@ class ProductTemplate(models.Model):
             product.x_final_price_mayorista = compute_price_incl(product.x_cost_base, product.x_utility_pct_mayorista)
             product.x_final_price_oferta = compute_price_incl(product.x_cost_base, product.x_utility_pct_oferta)
 
-    # ================================
-    # PRECIOS SIN IVA (PARA LISTAS)
-    # ================================
-    def _channel_prices_excl(self):
+# ==========================================
+# PRECIOS SIN IVA (PARA LISTAS)
+# ==========================================
+def _channel_prices_excl(self):
     self.ensure_one()
     cost = self.x_cost_base or 0.0
 
@@ -74,48 +74,49 @@ class ProductTemplate(models.Model):
         price_excl = cost * (1 + (utility or 0.0) / 100.0)
         return float_round(price_excl, precision_rounding=self.currency_id.rounding)
 
-    return {
-        "T.A.T (COP)": p(self.x_utility_pct_tat),
-        "P.O.S (COP)": p(self.x_utility_pct_pos),
-        "MAYORISTAS (COP)": p(self.x_utility_pct_mayorista),
-        "OFERTA (COP)": p(self.x_utility_pct_oferta),
-    }
+   return {
+    "T.A.T": p(self.x_utility_pct_tat),
+    "P.O.S": p(self.x_utility_pct_pos),
+    "MAYORISTAS": p(self.x_utility_pct_mayorista),
+    "OFERTA": p(self.x_utility_pct_oferta),
+}
 
-    # ================================
-    # SINCRONIZAR LISTAS
-    # ================================
-    def _sync_pricelist_items(self):
-        Pricelist = self.env["product.pricelist"].sudo()
-        Item = self.env["product.pricelist.item"].sudo()
+# ==========================================
+# SINCRONIZAR LISTAS
+# ==========================================
+def _sync_pricelist_items(self):
+    Pricelist = self.env["product.pricelist"].sudo()
+    Item = self.env["product.pricelist.item"].sudo()
 
-        for product in self:
-            prices = product._channel_prices_excl()
+    for product in self:
+        prices = product._channel_prices_excl()
 
-            for pl_name, fixed_price in prices.items():
-                if fixed_price <= 0:
-                    continue
-                pricelist = Pricelist.search([("name", "ilike", pl_name.strip())], limit=1)
-                if not pricelist:
-                    continue
+        for pl_name, fixed_price in prices.items():
+            if fixed_price <= 0:
+                continue
 
-                item = Item.search([
-                    ("pricelist_id", "=", pricelist.id),
-                    ("applied_on", "=", "1_product"),
-                    ("product_tmpl_id", "=", product.id),
-                ], limit=1)
+            pricelist = Pricelist.search([("name", "=", pl_name)], limit=1)
+            if not pricelist:
+                continue
 
-                vals = {
-                    "pricelist_id": pricelist.id,
-                    "applied_on": "1_product",
-                    "product_tmpl_id": product.id,
-                    "compute_price": "fixed",
-                    "fixed_price": fixed_price,
-                }
+            item = Item.search([
+                ("pricelist_id", "=", pricelist.id),
+                ("applied_on", "=", "1_product"),
+                ("product_tmpl_id", "=", product.id),
+            ], limit=1)
 
-                if item:
-                    item.write(vals)
-                else:
-                    Item.create(vals)
+            vals = {
+                "pricelist_id": pricelist.id,
+                "applied_on": "1_product",
+                "product_tmpl_id": product.id,
+                "compute_price": "fixed",
+                "fixed_price": fixed_price,
+            }
+
+            if item:
+                item.write(vals)
+            else:
+                Item.create(vals)
 
     def write(self, vals):
         # --- PERMISOS eco_pricing_margen ---

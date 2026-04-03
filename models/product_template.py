@@ -67,26 +67,19 @@ class ProductTemplate(models.Model):
     # PRECIOS SIN IVA (PARA LISTAS)
     # ================================
     def _channel_prices_excl(self):
-        self.ensure_one()
-        cost = self.x_cost_base or 0.0
-        if not cost:
-            return {
-                "T.A.T": 0.0,
-                "P.O.S": 0.0,
-                "MAYORISTA": 0.0,
-                "OFERTAS": 0.0,
-            }
+    self.ensure_one()
+    cost = self.x_cost_base or 0.0
 
-        def p(utility):
-            price_excl = cost * (1 + (utility or 0.0) / 100.0)
-            return float_round(price_excl, precision_rounding=self.currency_id.rounding)
+    def p(utility):
+        price_excl = cost * (1 + (utility or 0.0) / 100.0)
+        return float_round(price_excl, precision_rounding=self.currency_id.rounding)
 
-        return {
-            "T.A.T": p(self.x_utility_pct_tat),
-            "P.O.S": p(self.x_utility_pct_pos),
-            "MAYORISTA": p(self.x_utility_pct_mayorista),
-            "OFERTAS": p(self.x_utility_pct_oferta),
-        }
+    return {
+        "T.A.T (COP)": p(self.x_utility_pct_tat),
+        "P.O.S (COP)": p(self.x_utility_pct_pos),
+        "MAYORISTAS (COP)": p(self.x_utility_pct_mayorista),
+        "OFERTA (COP)": p(self.x_utility_pct_oferta),
+    }
 
     # ================================
     # SINCRONIZAR LISTAS

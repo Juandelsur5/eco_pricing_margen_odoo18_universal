@@ -94,8 +94,7 @@ class ProductTemplate(models.Model):
             for pl_name, fixed_price in prices.items():
                 if fixed_price <= 0:
                     continue
-
-                pricelist = Pricelist.search([("name", "=", pl_name)], limit=1)
+                pricelist = Pricelist.search([("name", "ilike", pl_name.strip())], limit=1)
                 if not pricelist:
                     continue
 

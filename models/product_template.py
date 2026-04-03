@@ -136,11 +136,11 @@ class ProductTemplate(models.Model):
                 'x_utility_pct_mayorista',
                 'x_utility_pct_oferta'
             }:
-                if not self.env.user.has_group('eco_pricing_margen.group_margen_precios_edit'):
+                if not self.env.user.has_group('eco_pricing_margen_odoo18_universal.group_margen_precios_edit'):
                     raise AccessError(_('No autorizado.'))
 
             if 'x_cost_base' in incoming:
-                if not self.env.user.has_group('eco_pricing_margen.group_margen_precios_update_cost'):
+                if not self.env.user.has_group('eco_pricing_margen_odoo18_universal.group_margen_precios_update_cost'):
                     raise AccessError(_('No autorizado.'))
 
         res = super().write(vals)

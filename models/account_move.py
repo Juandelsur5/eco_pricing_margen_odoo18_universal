@@ -15,7 +15,7 @@ class AccountMove(models.Model):
                 # Compras → requiere permiso actualizar costo
                 if move.move_type in ["in_invoice", "in_refund", "in_receipt"]:
                     if not self.env.user.has_group(
-                        "eco_pricing_margen.group_margen_precios_update_cost"
+                        "eco_pricing_margen_odoo18_universal.group_margen_precios_update_cost"
                     ):
                         raise UserError(
                             "No tiene permisos para postear documentos de compra que actualizan costo."
@@ -24,7 +24,7 @@ class AccountMove(models.Model):
                 # Ventas → requiere permiso aplicar venta
                 if move.move_type in ["out_invoice", "out_refund", "out_receipt"]:
                     if not self.env.user.has_group(
-                        "eco_pricing_margen.group_margen_precios_apply_sale"
+                        "eco_pricing_margen_odoo18_universal.group_margen_precios_apply_sale"
                     ):
                         raise UserError(
                             "No tiene permisos para postear documentos de venta."

@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_product_template_margen,access_product_template_margen,model_product_template,eco_pricing_margen.group_margen_precios,1,1,1,0
+access_product_template_margen,access_product_template_margen,model_product_template,eco_pricing_margen_odoo18_universal.group_margen_precios,1,1,1,0

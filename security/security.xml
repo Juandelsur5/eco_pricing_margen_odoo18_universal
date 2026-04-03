@@ -15,19 +15,19 @@
         <record id="group_margen_precios_edit" model="res.groups">
             <field name="name">Margen Precios - Editar</field>
             <field name="category_id" ref="cat_margen_precios"/>
-            <field name="implied_ids" eval="[(4, ref('eco_pricing_margen.group_margen_precios_view'))]"/>
+            <field name="implied_ids" eval="[(4, ref('eco_pricing_margen_odoo18_universal.group_margen_precios_view'))]"/>
         </record>
 
         <record id="group_margen_precios_update_cost" model="res.groups">
             <field name="name">Margen Precios - Actualizar costo</field>
             <field name="category_id" ref="cat_margen_precios"/>
-            <field name="implied_ids" eval="[(4, ref('eco_pricing_margen.group_margen_precios_view'))]"/>
+            <field name="implied_ids" eval="[(4, ref('eco_pricing_margen_odoo18_universal.group_margen_precios_view'))]"/>
         </record>
 
         <record id="group_margen_precios_apply_sale" model="res.groups">
             <field name="name">Margen Precios - Aplicar en venta</field>
             <field name="category_id" ref="cat_margen_precios"/>
-            <field name="implied_ids" eval="[(4, ref('eco_pricing_margen.group_margen_precios_view'))]"/>
+            <field name="implied_ids" eval="[(4, ref('eco_pricing_margen_odoo18_universal.group_margen_precios_view'))]"/>
         </record>
 
     <!-- LEGACY GROUP - NO BORRAR (evita FK id=63) -->
@@ -35,10 +35,10 @@
   <field name="name">Margen Precios</field>
   <field name="category_id" ref="cat_margen_precios"/>
   <field name="implied_ids" eval="[
-    (4, ref('eco_pricing_margen.group_margen_precios_view')),
-    (4, ref('eco_pricing_margen.group_margen_precios_edit')),
-    (4, ref('eco_pricing_margen.group_margen_precios_update_cost')),
-    (4, ref('eco_pricing_margen.group_margen_precios_apply_sale'))
+    (4, ref('eco_pricing_margen_odoo18_universal.group_margen_precios_view')),
+    (4, ref('eco_pricing_margen_odoo18_universal.group_margen_precios_edit')),
+    (4, ref('eco_pricing_margen_odoo18_universal.group_margen_precios_update_cost')),
+    (4, ref('eco_pricing_margen_odoo18_universal.group_margen_precios_apply_sale'))
   ]"/>
 </record>
 </data>

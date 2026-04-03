@@ -14,10 +14,11 @@
         'views/product_template_views.xml',
         'views/res_partner_views.xml',
         'views/menu.xml',
+        'data/pricelist_data.xml',
     ],
     'license': 'LGPL-3',
     'installable': True,
     'application': True,
-    'web_icon': 'eco_pricing_margen,static/description/icon.png',
+    'web_icon': 'eco_pricing_margen_odoo18_universal/static/description/icon.png',
     'category': 'Sales',
 }

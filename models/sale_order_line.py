@@ -4,14 +4,14 @@ from odoo import models
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
-    def _get_product_price(self):
+    def _get_price_unit(self):
         self.ensure_one()
 
         product = self.product_id
         pricelist = self.order_id.pricelist_id
 
         if not product or not pricelist:
-            return super()._get_product_price()
+            return super()._get_price_unit()
 
         name = (pricelist.name or "").strip().upper()
         tmpl = product.product_tmpl_id
@@ -25,4 +25,4 @@ class SaleOrderLine(models.Model):
         elif "OFERTA" in name:
             return tmpl.x_final_price_oferta
 
-        return super()._get_product_price()
+        return super()._get_price_unit()

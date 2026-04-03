@@ -21,13 +21,13 @@ class SaleOrderLine(models.Model):
 
         name = (pricelist.name or "").strip().upper()
 
-        if name == "T.A.T":
+        if name.startswith("T.A.T"):
             return product.x_final_price_tat
-        elif name == "P.O.S":
+        elif name.startswith("P.O.S"):
             return product.x_final_price_pos
-        elif name == "MAYORISTAS":
+        elif name.startswith("MAYORISTAS"):
             return product.x_final_price_mayorista
-        elif name == "OFERTA":
+        elif name.startswith("OFERTA"):
             return product.x_final_price_oferta
 
         return False

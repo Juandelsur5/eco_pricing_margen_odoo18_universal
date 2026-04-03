@@ -21,54 +21,50 @@ class SaleOrderLine(models.Model):
 
         name = (pricelist.name or "").strip().upper()
 
-        if name.startswith("T.A.T"):
+        # 🔥 DETECCIÓN ROBUSTA (NO FALLA CON "(COP)")
+        if "T.A.T" in name:
             return product.x_final_price_tat
-        elif name.startswith("P.O.S"):
+        elif "P.O.S" in name:
             return product.x_final_price_pos
-        elif name.startswith("MAYORISTAS"):
+        elif "MAYORISTAS" in name:
             return product.x_final_price_mayorista
-        elif name.startswith("OFERTA"):
+        elif "OFERTA" in name:
             return product.x_final_price_oferta
 
         return False
 
-    def _apply_channel_price(self):
+    def _force_channel_price(self):
         for line in self:
             if not line.product_id or line.display_type:
                 continue
 
-            channel_price = line._get_channel_price_from_pricelist()
-            if channel_price not in (False, None):
-                line.price_unit = channel_price
+            price = line._get_channel_price_from_pricelist()
+            if price not in (False, None):
+                # 🔥 FORZAR PRECIO DESPUÉS DE ODOO
+                super(SaleOrderLine, line).write({
+                    "price_unit": price
+                })
                 line.x_manual_price_from_pricelist = True
 
     @api.onchange("product_id")
-    def _onchange_product_id_set_channel_price(self):
-        self._apply_channel_price()
+    def _onchange_product_id(self):
+        self._force_channel_price()
 
     @api.onchange("product_uom_qty")
-    def _onchange_product_uom_qty_keep_channel_price(self):
-        self._apply_channel_price()
+    def _onchange_product_uom_qty(self):
+        self._force_channel_price()
 
     @api.onchange("order_id.pricelist_id")
-    def _onchange_pricelist_id_set_channel_price(self):
-        self._apply_channel_price()
+    def _onchange_pricelist(self):
+        self._force_channel_price()
 
     @api.model_create_multi
     def create(self, vals_list):
         lines = super().create(vals_list)
-        lines._apply_channel_price()
+        lines._force_channel_price()
         return lines
 
     def write(self, vals):
         res = super().write(vals)
-
-        fields_that_reprice = {"product_id", "product_uom_qty"}
-        if set(vals.keys()) & fields_that_reprice:
-            for line in self:
-                if line.display_type:
-                    continue
-                if line.x_manual_price_from_pricelist:
-                    line._apply_channel_price()
-
+        self._force_channel_price()
         return res
